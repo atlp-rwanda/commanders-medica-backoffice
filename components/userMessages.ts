@@ -44,3 +44,10 @@ export const userMessages = [
     
      
 ]
+
+export const appointmentList = [
+    { name: "John Doe", visitType: "Doctor Visit", time: "10:30 AM", color: "#F62088" },
+    { name: "Jane Smith", visitType: "Lab Test", time: "09:45 AM", color: "#F62088" },
+    { name: "Alice Johnson", visitType: "Appointment", time: "08:15 AM", color: "#F62088" },
+    { name: "Bob Brown", visitType: "Consultation", time: "09:45AM", color: "#F62088" },
+]
