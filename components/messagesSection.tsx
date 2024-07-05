@@ -5,7 +5,7 @@ import { userMessages } from "./userMessages";
 export default function MessagesMain() {
     return (
 
-        <div className="bg-[#F8F8F8] rounded-l-[50px] ps-[30px] pt-[30px] overflow-x-hidden w-[88vw] h-[100vh] flex">
+        <div className="bg-[#F8F8F8] rounded-l-[50px] ps-[30px] pt-[30px] overflow-x-hidden w-full flex">
             <section className="border-r-2 pr-2 border-gray-300 w-[40%]">
                 <div className="flex flex-col">
                     <div className="relative">
@@ -107,7 +107,7 @@ export default function MessagesMain() {
                             </div>
                         </div>
                     </div>
-                    <div className="absolute bottom-[20px] w-[45%]">
+                    <div className="relative top-[20px] bottom-0 w-[100%] pb-[45px]">
                         <div className="w-[100%] bg-gray-200 rounded-xl p-2 flex gap-[20px] items-center">
                             <div className="relative w-[90%]">
                                 <div>

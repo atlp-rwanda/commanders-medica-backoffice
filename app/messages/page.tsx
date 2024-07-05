@@ -10,7 +10,7 @@ export default function Messages() {
             <div className="my-[30px] w-fit">
                 <Navbar />
             </div>
-            <div className="w-80%">
+            <div className="w-full">
               <MessagesMain/>
             </div>
         </main>
