@@ -2,15 +2,15 @@ import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <nav className="flex-no-wrap relative flex w-full items-center justify-between py-2 px-5 shadow-dark-mild lg:flex-wrap lg:justify-start lg:py-4">
-      <div className="flex w-full flex-wrap items-center justify-between px-3">
+    <nav className="flex-no-wrap relative flex w-full items-center justify-between py-4 shadow-dark-mild lg:flex-wrap lg:justify-start lg:py-4">
+      <div className="flex w-full flex-wrap items-center justify-between h-8">
         <button
-          className="block border-0 bg-transparent px-2 text-black/50 hover:no-underline hover:shadow-none focus:no-underline focus:shadow-none focus:outline-none focus:ring-0 dark:text-neutral-200 lg:hidden"
+          className="block border-0 bg-transparent px-2 text-black/50 hover:no-underline hover:shadow-none focus:no-underline focus:shadow-none focus:outline-none focus:ring-0 lg:hidden"
           type="button"
           aria-expanded="false"
           aria-label="Toggle navigation"
         >
-          <span className="[&>svg]:w-7 [&>svg]:stroke-black/50 dark:[&>svg]:stroke-neutral-200">
+          <span className="[&>svg]:w-7 [&>svg]:stroke-black/50">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -30,12 +30,10 @@ export default function Navbar() {
             className="mb-4 me-5 ms-2 mt-3 flex items-center lg:mb-0 lg:mt-0"
             href="#"
           >
-            <img
-              src="/favicon-32x32.png"
-              loading="lazy"
-              className="h-8"
-            />
-            <span className="font-bold text-lg ms-2 text-primary-500">Medica</span>
+            <img src="/favicon-32x32.png" loading="lazy" className="h-8" />
+            <span className="font-bold text-lg ms-2 text-primary-500">
+              Medica
+            </span>
           </a>
           <ul className="list-style-none ms-auto flex flex-col ps-0 lg:flex-row">
             <li className="mb-4 lg:mb-0 lg:pe-2">
