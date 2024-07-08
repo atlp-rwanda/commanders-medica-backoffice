@@ -11,14 +11,26 @@
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-rgb: 0, 0, 0;
+    --blue-color: #246BFD;
   }
 } */
 
 body {
+  width: 100%;
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
+  /* color: rgb(var(--foreground-rgb)); */
+  /* background-color: #246BFD; */
 }
-
+.width{
+  width: 100px;
+}
+.calendar{
+  border:none;
+}
+.hide{
+  display: none;
+}
 @layer utilities {
   .text-balance {
     text-wrap: balance;
