@@ -56,6 +56,9 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-urbanist)", "sans-serif"],
       },
+      animation: {
+        "slow-spin": "spin 1.5s linear infinite",
+      },
     },
   },
   plugins: [],
