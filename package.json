@@ -13,9 +13,12 @@
     "@supabase/supabase-js": "^2.44.0",
     "next": "14.2.4",
     "react": "^18",
+    "react-calendar": "^5.0.0",
+    "react-datetime": "^3.2.0",
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@flydotio/dockerfile": "^0.5.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
