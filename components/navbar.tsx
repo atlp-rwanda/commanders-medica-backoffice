@@ -2,7 +2,11 @@
 import { combineChunks } from "@supabase/ssr";
 import Image from "next/image"
 import Link from "next/link";
+import { createClient } from "@/utils/supabase/client";
+import {useRouter} from "next/navigation"
+const supabase = createClient();
 export default function Navbar() {
+    const router=useRouter();
     const handleHide = () => {
         // const hamburger= document.querySelector('#menu')
         const desc = document.querySelectorAll('.desc');
@@ -12,6 +16,14 @@ export default function Navbar() {
         const container = document.querySelector('#container') as HTMLDivElement;
         container.classList.toggle('width');
 
+    }
+    const signOut=async ()=>{
+        const {error}=await supabase.auth.signOut();
+        setTimeout(()=>{
+
+            router.push("/auth/login")
+        },80)
+        
     }
     return (
         <div className="px-[30px] py-[30px] w-[200px] flex justify-center transition-all" id="container">
@@ -43,18 +55,21 @@ export default function Navbar() {
                     </div>
                     <span className="desc">Reports</span>
                 </div>
-                <div className="flex gap-[30px] items-center hover:bg-[#FFFFFF40] rounded-xl p-2">
+                <Link href="/profile"> <div className="flex gap-[30px] items-center hover:bg-[#FFFFFF40] rounded-xl p-2">
                     <div className="w-[30px]">
                         <span><Image src={require("../assets/icons/settings.svg")} alt="home" /> </span>
                     </div>
                     <span className="desc">Settings</span>
                 </div>
+                </Link>
+                <button onClick={signOut}>
                 <div className="flex gap-[30px] items-center hover:bg-[#FFFFFF40] rounded-xl p-2">
                     <div className="w-[30px]">
                         <span><Image src={require("../assets/icons/logout.svg")} alt="home" /> </span>
                     </div>
                     <span className="desc">Logout</span>
                 </div>
+                </button>
             </div>
         </div>
     )

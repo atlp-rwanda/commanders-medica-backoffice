@@ -144,32 +144,49 @@ export default function SignupPage() {
             </select>
           </div>
           <div className="flex flex-col mb-5">
-            <label htmlFor="email" className="mb-1">
-              Position:
+            <label htmlFor="position" className="mb-1">
+              Specialization:
             </label>
-            <input
+            <select
+              defaultValue=""
               id="position"
               name="position"
-              type="text"
               required
               autoComplete="position"
               className="p-2 border rounded-lg border-neutral-400 focus:border-primary-500 focus:ring-2 outline-none"
-            />
+            >
+              <option disabled value="">Select Specialization</option>
+              <option value="Dentist">Dentist</option>
+              <option value="Dermatologist">Dermatologist</option>
+              <option value="Nutritionist">Nutritionist</option>
+              <option value="Cardiologist">Cardiologist</option>
+              <option value="Neurologist">Neurologist</option>
+              <option value="Pediatrician">Pediatrician</option>
+              <option value="Surgeon">Surgeon</option>
+              <option value="Immunologist">Immunologist</option>
+              <option value="Gastroenterologist">Gastroenterologist</option>
+            </select>
           </div>
           <div className="flex flex-col mb-5">
-            <label htmlFor="email" className="mb-1">
-              Hospital
+            <label htmlFor="hospital" className="mb-1">
+              Hospital:
             </label>
-            <input
+            <select
+              defaultValue=""
               id="hospital"
               name="hospital"
-              type="text"
               required
-              autoComplete="hospital"
               className="p-2 border rounded-lg border-neutral-400 focus:border-primary-500 focus:ring-2 outline-none"
-            />
+            >
+              <option disabled value="">Select a hospital</option>
+              <option value="CHUK">CHUK</option>
+              <option value="CHUB">CHUB</option>
+              <option value="MASAKA Hospital">MASAKA Hospital</option>
+              <option value="King FaisaL Hospital">King FaisaL Hospital</option>
+              <option value="KIBAGABAGA HOSPITAL ">KIBAGABAGA HOSPITAL </option>
+              <option value="Muhima HOSPITAL ">Muhima HOSPITAL </option>
+            </select>
           </div>
-
           <div className="flex flex-col mb-5">
             <label htmlFor="password" className="mb-1">
               Password:

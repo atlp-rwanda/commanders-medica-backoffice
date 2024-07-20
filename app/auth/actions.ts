@@ -115,6 +115,7 @@ export async function signup(formData: FormData) {
   const { error: spbsError } = await supabase.from("doctor").insert({
     name: data.fullname,
     role: data.position,
+    email: data.email,
     hospital: data.hospital,
     certificate: certificateURL.publicUrl,
     cv: cvURL.publicUrl,

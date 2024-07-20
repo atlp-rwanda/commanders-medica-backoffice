@@ -54,9 +54,12 @@ export default function LoginPage() {
           />
         </div>
         <div className="flex flex-col mb-5">
+          <div className="flex justify-between">
           <label htmlFor="password" className="mb-1">
             Password:
           </label>
+          <Link href="/auth/reset" className="text-[#246BFD] font-medium">Forgot password?</Link>
+          </div>
           <input
             id="password"
             name="password"
@@ -65,6 +68,7 @@ export default function LoginPage() {
             autoComplete="current-password"
             className="p-2 border rounded-lg border-neutral-400 focus:border-primary-500 focus:ring-2 outline-none font-serif"
           />
+          
         </div>
         <div className="flex flex-row mb-5 gap-1 items-center">
           <input type="checkbox" id="remember" name="remember" />
