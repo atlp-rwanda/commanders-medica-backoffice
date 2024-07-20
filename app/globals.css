@@ -28,6 +28,9 @@ body {
 .calendar{
   border:none;
 }
+audio{
+  font-family: var(--font-urbanist) !important;
+}
 .hide{
   display: none;
 }

@@ -1,4 +1,5 @@
 'use server'
+import { revalidatePath } from "next/cache";
 import { createClient } from "./server";
 const supabase = createClient();
  export async function getCurrentUser(){
@@ -9,6 +10,10 @@ const supabase = createClient();
     else{
         return data;
     }
+}
+export const pathRevalidation=(path:string)=>{
+    revalidatePath(`/${path}`);
+    
 }
 // export async function fetchDoctor(userId:string){
 //     const {data, error}= await supabase.from('doctor')
