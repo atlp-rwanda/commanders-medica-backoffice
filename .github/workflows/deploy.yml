@@ -2,7 +2,7 @@ name: Deployment Pipeline
 on:
   push:
     branches:
-      - main
+      - dev
 jobs:
   deploy:
     name: Deploy to Fly
