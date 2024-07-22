@@ -26,5 +26,6 @@ jobs:
       - name: Install Node.js dependencies
         run: npm ci
 
-      - name: Run linter
-        run: npm run lint
+      # Build step runs a linter as well and will fail if there are any linting errors
+      - name: Run Linter and Build
+        run: npm run build

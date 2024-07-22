@@ -1,51 +1,64 @@
 "use client";
-import { DoctorType } from "@/app/dashboard/page";
+import { AuthContext } from "@/app/dashboard/layout";
+import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import {
+  Appointment,
+  getColorByPackage,
+  Patient,
+} from "./dashboard/appointments/upcomingAppointments";
 import ListItem from "./listItem";
 import TopBar from "./topbar";
-export default function MainSection({
-  firstName,
-  lastName,
-  email,
-  image,
-}: DoctorType) {
-  const listItems = [
-    {
-      name: "John Doe",
-      visitType: "Doctor Visit",
-      time: "10:30 AM",
-      color: "#F62088",
-    },
-    {
-      name: "Jane Smith",
-      visitType: "Lab Test",
-      time: "09:45 AM",
-      color: "#F62088",
-    },
-    {
-      name: "Alice Johnson",
-      visitType: "Appointment",
-      time: "08:15 AM",
-      color: "#F62088",
-    },
-    {
-      name: "Bob Brown",
-      visitType: "Consultation",
-      time: "09:45AM",
-      color: "#F62088",
-    },
-  ];
-  type ValuePiece = Date | null;
-  type Value = ValuePiece | [ValuePiece, ValuePiece];
+
+type ValuePiece = Date | null;
+type Value = ValuePiece | [ValuePiece, ValuePiece];
+
+export default function MainSection() {
+  const currentUser = useContext(AuthContext);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+
+  const getPatientName = (patient: Patient) =>
+    patient.full_name + " " + patient.nickname;
+
+  useEffect(() => {
+    if (!currentUser) return;
+    const supabase = createClient();
+    const fetchAppointments = async () => {
+      const { data, error } = await supabase
+        .from("appointment")
+        .select(
+          "id, date:appointment_date, time:appointment_time, package, duration, amount, cancellation_reason:Reason_couse_toUpdated, patient:patient_id(full_name, nickname, email, phone)"
+        )
+        .eq("doctor_id", currentUser.id)
+        .eq("status", "Approved")
+        .gt("appointment_date", new Date().toISOString())
+        .order("appointment_date", { ascending: true })
+        .limit(5);
+
+      if (error) {
+        console.log(error);
+      }
+
+      if (data) {
+        setAppointments(data);
+      }
+    };
+    fetchAppointments();
+  }, [currentUser]);
+
   const [dateValue, setDateValue] = useState<Value>(new Date());
+
   return (
     <div className="bg-[#F8F8F8] rounded-l-[50px] ps-[30px] pt-[30px] overflow-x-hidden w-[100%]">
       <div>
-        <TopBar firstName={firstName} image={image!} />
+        <TopBar
+          firstName={currentUser?.firstName ?? ""}
+          image={currentUser?.image ?? ""}
+        />
       </div>
       <section className="pt-[30px] flex justify-between flex-wrap w-full">
         <section className="w-[60%] max-[1190px]:w-[90%]">
@@ -54,7 +67,7 @@ export default function MainSection({
               <h1 className="text-[22px]">
                 Good morning &nbsp;{" "}
                 <span className="text-[#246BFD] text-[26px] font-semibold">
-                  Dr {firstName}!
+                  Dr {currentUser?.firstName}!
                 </span>
               </h1>
             </span>
@@ -84,7 +97,7 @@ export default function MainSection({
                   <p>Old Patients</p>
                   <div className="flex pt-4 items-center">
                     <p className="font-semibold text-[30px]">64</p>
-                    <div className="bg-[#FBC3C3] flex gap-3 ml-3 rounded-xl items-center ml-[1rem] h-[20px] p-1">
+                    <div className="bg-[#FBC3C3] flex gap-3 rounded-xl items-center ml-[1rem] h-[20px] p-1">
                       <p className="text-[#D30404] text-[14px]">24%</p>
                       <Image
                         src={require("../assets/icons/downward.svg")}
@@ -104,7 +117,7 @@ export default function MainSection({
               />
             </div>
           </section>
-          <section className="w-[100%] p-2 flex bg-white rounded-xl shadow-md p-5 mt-5 max-[720px]:flex-wrap">
+          <section className="w-[100%] flex bg-white rounded-xl shadow-md p-5 mt-5 max-[720px]:flex-wrap">
             <div className="w-[50%] max-[720px]:w-[80%] p-2">
               <div className="flex justify-between items-center pb-2 text-[18px]">
                 <p className="font-medium my-2">Upcoming appointments</p>
@@ -118,15 +131,21 @@ export default function MainSection({
               </div>
 
               <div className="flex flex-col gap-[20px]">
-                {listItems.map((item, i) => (
-                  <ListItem
-                    key={i}
-                    name={item.name}
-                    visitType={item.visitType}
-                    time={item.time}
-                    color={item.color}
-                  />
-                ))}
+                {appointments.length === 0 && (
+                  <p className="text-center text-gray-500 py-12">
+                    No appointments found
+                  </p>
+                )}
+                {appointments.length > 0 &&
+                  appointments.map((appointment) => (
+                    <ListItem
+                      key={appointment.id}
+                      name={getPatientName(appointment.patient)}
+                      visitType={appointment.package}
+                      time={appointment.time}
+                      color={getColorByPackage(appointment.package)?.dark!}
+                    />
+                  ))}
               </div>
             </div>
             <div className="w-[50%] p-4 border-[1px] border-[#58B6DE] ml-[20px] rounded-xl max-[720px]:w-[80%]">
@@ -228,7 +247,8 @@ export default function MainSection({
           <div className="bg-white rounded-xl shadow-md p-5">
             <div>
               <Calendar
-                className={"rounded-xl border-none font-mono calendar"}
+                className={"calendar"}
+                locale="en-US"
                 onChange={setDateValue}
               />
             </div>
