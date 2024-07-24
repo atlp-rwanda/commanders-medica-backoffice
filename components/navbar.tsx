@@ -64,14 +64,6 @@ export default function Navbar() {
           </div>
           <span className="desc font-semibold">Messages</span>
         </Link>
-        <div className="flex gap-[20px] items-center hover:bg-[#FFFFFF40] rounded-xl py-2 px-4">
-          <div className="w-[30px]">
-            <span>
-              <Image src={require("../assets/icons/reports.svg")} alt="home" />{" "}
-            </span>
-          </div>
-          <span className="desc font-semibold">Reports</span>
-        </div>
         <Link href="/dashboard/profile" className="flex gap-[20px] items-center hover:bg-[#FFFFFF40] rounded-xl py-2 px-4">
           <div className="w-[30px]">
             <span>

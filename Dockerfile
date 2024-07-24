@@ -2,6 +2,8 @@
 
 # Adjust NODE_VERSION as desired
 ARG NODE_VERSION=20.15.0
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 FROM node:${NODE_VERSION}-slim as base
 
 LABEL fly_launch_runtime="Next.js"
@@ -27,6 +29,8 @@ RUN npm ci --include=dev
 # Copy application code
 COPY --link . .
 
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 # Build application
 RUN npm run build
 

@@ -4,64 +4,29 @@ import { createClient } from "@/utils/supabase/client";
 import { useContext, useEffect, useState } from "react";
 import {
   Appointment,
+  AppointmentCalendarContext,
+  getAppointmentDate,
+  getAppointmentDuration,
+  getAppointmentTime,
   getColorByPackage,
-  Patient,
-} from "./upcomingAppointments";
+  getDate,
+  getPatientAge,
+  getPatientName,
+} from "./helpers";
 
 export default function AppointmentRequests() {
   const currentUser = useContext(AuthContext);
+  const { date } = useContext(AppointmentCalendarContext);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
 
-  const getPatientName = (patient: Patient) =>
-    patient.full_name + " " + patient.nickname;
-
-  const getAppointmentTime = (time: string) => {
-    const [hours, minutes] = time.split(":");
-    return `${hours}:${minutes} ${parseInt(hours) >= 12 ? "PM" : "AM"}`;
-  };
-
-  const getAppointmentDate = (date: string) =>
-    new Date(date).toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-
-  const getAppointmentDuration = (time: string, duration: string) => {
-    const [hours, minutes] = time.split(":");
-    const [count, identifier] = duration.split(" ");
-    const totalMinutes = parseInt(hours) * 60 + parseInt(minutes);
-    let endMinutes = totalMinutes;
-
-    if (identifier === "minutes") {
-      endMinutes += parseInt(count);
-    } else {
-      endMinutes += parseInt(count) * 60;
-    }
-
-    const endHours = Math.floor(endMinutes / 60);
-    const endMinutesRemainder = endMinutes % 60;
-
-    return `${hours}:${minutes} - ${endHours}:${endMinutesRemainder} ${
-      endHours >= 12 ? "PM" : "AM"
-    } (${duration})`;
-  };
-
-  const getPatientAge = (dateOfBirth: string) => {
-    if (!dateOfBirth) return "N/A";
-    const dob = new Date(dateOfBirth);
-    const diffMs = Date.now() - dob.getTime();
-    const ageDt = new Date(diffMs);
-    return Math.abs(ageDt.getUTCFullYear() - 1970);
-  };
-
   useEffect(() => {
     if (!currentUser) return;
+    if (!date) return;
+
     const supabase = createClient();
     const fetchAppointments = async () => {
       setLoading(true);
@@ -72,6 +37,7 @@ export default function AppointmentRequests() {
         )
         .eq("doctor_id", currentUser.id)
         .eq("status", "Booked")
+        .gt("appointment_date", getDate(date).toISOString())
         .order("appointment_date", { ascending: true })
         .limit(5);
 
@@ -86,7 +52,7 @@ export default function AppointmentRequests() {
       }
     };
     fetchAppointments();
-  }, [currentUser]);
+  }, [currentUser, date]);
 
   const approveAppointment = async (appointment: Appointment) => {
     const supabase = createClient();
@@ -214,14 +180,6 @@ export default function AppointmentRequests() {
       <section className="p-6 bg-white rounded-2xl shadow-md mb-3">
         <div className="flex flex-row">
           <h4 className="text-lg font-semibold flex-1">Appointment Requests</h4>
-          <div className="w-32">
-            <select className="bg-transparent focus:outline-none w-full">
-              <option>Today</option>
-              <option>Tomorrow</option>
-              <option>This week</option>
-              <option>This month</option>
-            </select>
-          </div>
         </div>
         <div className={"overflow-auto" + (loading ? " my-24" : " my-8")}>
           {loading && appointments.length == 0 && (

@@ -9,9 +9,11 @@ import "react-calendar/dist/Calendar.css";
 import {
   Appointment,
   getColorByPackage,
-  Patient,
-} from "./dashboard/appointments/upcomingAppointments";
+  getDate,
+  getPatientName,
+} from "./dashboard/appointments/helpers";
 import ListItem from "./listItem";
+import Loading from "./Loading";
 import TopBar from "./topbar";
 
 type ValuePiece = Date | null;
@@ -20,12 +22,12 @@ type Value = ValuePiece | [ValuePiece, ValuePiece];
 export default function MainSection() {
   const currentUser = useContext(AuthContext);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-
-  const getPatientName = (patient: Patient) =>
-    patient.full_name + " " + patient.nickname;
+  const [date, setDate] = useState<Value>(new Date());
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!currentUser) return;
+    setLoading(true);
     const supabase = createClient();
     const fetchAppointments = async () => {
       const { data, error } = await supabase
@@ -35,9 +37,11 @@ export default function MainSection() {
         )
         .eq("doctor_id", currentUser.id)
         .eq("status", "Approved")
-        .gt("appointment_date", new Date().toISOString())
+        .gt("appointment_date", getDate(date).toISOString())
         .order("appointment_date", { ascending: true })
         .limit(5);
+
+      setLoading(false);
 
       if (error) {
         console.log(error);
@@ -48,9 +52,7 @@ export default function MainSection() {
       }
     };
     fetchAppointments();
-  }, [currentUser]);
-
-  const [dateValue, setDateValue] = useState<Value>(new Date());
+  }, [currentUser, date]);
 
   return (
     <div className="bg-[#F8F8F8] rounded-l-[50px] ps-[30px] pt-[30px] overflow-x-hidden w-[100%]">
@@ -121,22 +123,24 @@ export default function MainSection() {
             <div className="w-[50%] max-[720px]:w-[80%] p-2">
               <div className="flex justify-between items-center pb-2 text-[18px]">
                 <p className="font-medium my-2">Upcoming appointments</p>
-                <div className="flex gap-2 items-center  ">
-                  <p className=" text-gray-500 font-light">Today</p>
-                  <Image
-                    src={require("../assets/icons/accordion.svg")}
-                    alt="accordion"
-                  />
-                </div>
               </div>
 
               <div className="flex flex-col gap-[20px]">
-                {appointments.length === 0 && (
+                {loading && appointments.length == 0 && (
+                  <div className="mt-12">
+                    <Loading
+                      loading={loading}
+                      label="Loading upcoming appointments"
+                    />
+                  </div>
+                )}
+                {!loading && appointments.length === 0 && (
                   <p className="text-center text-gray-500 py-12">
                     No appointments found
                   </p>
                 )}
-                {appointments.length > 0 &&
+                {!loading &&
+                  appointments.length > 0 &&
                   appointments.map((appointment) => (
                     <ListItem
                       key={appointment.id}
@@ -249,7 +253,7 @@ export default function MainSection() {
               <Calendar
                 className={"calendar"}
                 locale="en-US"
-                onChange={setDateValue}
+                onChange={setDate}
               />
             </div>
             <div className="flex justify-between items-center pt-4">
