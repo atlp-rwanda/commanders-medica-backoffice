@@ -14,6 +14,7 @@ export default function MessagesMain({ messages }: MessageProps) {
   const [appDate, setAppDate] = useState<string>("");
   const [appTime, setAppTime] = useState<string>("");
   const [isEnded, setIsEnded] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const handleChanges = (
     str: string,
     appId: string,
@@ -83,6 +84,7 @@ export default function MessagesMain({ messages }: MessageProps) {
             <input
               placeholder="Search"
               className="border-[1px] w-full p-2 rounded-xl bg-[#E5E5E5]"
+              onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
             />
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
               <Image
@@ -96,7 +98,8 @@ export default function MessagesMain({ messages }: MessageProps) {
           </div>
         </div>
         <div className="flex-1 justify-between overflow-y-auto px-[30px] py-[20px]">
-          {groupedMessages.map((message) => (
+          {groupedMessages.filter((message)=>message.appointment.patient.full_name.toLowerCase().includes(searchTerm))
+          .map((message) => (
             <button
               key={message.id}
               className="w-full"
@@ -223,7 +226,7 @@ export default function MessagesMain({ messages }: MessageProps) {
           {isEnded ? (
             <div className="flex justify-center p-[30px]">
               <div className="p-2 bg-gray-300 rounded-md w-fit">
-                <p>Session ended</p>
+                <p>Currently you don't have access to this session</p>
               </div>
             </div>
           ) : (
