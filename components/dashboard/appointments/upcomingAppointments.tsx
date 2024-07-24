@@ -1,71 +1,24 @@
 import { AuthContext } from "@/app/dashboard/layout";
 import Loading from "@/components/Loading";
 import { createClient } from "@/utils/supabase/client";
-import { UUID } from "crypto";
 import { useContext, useEffect, useState } from "react";
-
-export type Patient = {
-  id: UUID;
-  full_name: string;
-  nickname: string;
-  email: string;
-  phone: string;
-  gender: string;
-  date_of_birth: string;
-  problem: string;
-};
-
-export type Appointment = {
-  id: UUID;
-  patient_id: UUID;
-  doctor_id: UUID;
-  date: string;
-  time: string;
-  status: "Booked" | "Approved" | "Completed" | "Cancelled" | "Rescheduled";
-  package: "Messaging" | "Video Call" | "Voice Call";
-  duration: string;
-  amount: string;
-  cancellation_reason: string;
-  patient: Patient;
-};
-
-const colors = [
-  {
-    type: "Messaging",
-    light: "#fdd2e7",
-    dark: "#F62088",
-  },
-  {
-    type: "Video Call",
-    light: "#ccccff",
-    dark: "#6666ff",
-  },
-  {
-    type: "Voice Call",
-    light: "#cfe7e6",
-    dark: "#128983",
-  },
-];
-
-export const getColorByPackage = (type: string) => {
-  return colors.find((color) => color.type === type);
-};
+import {
+  Appointment,
+  AppointmentCalendarContext,
+  getAppointmentTime,
+  getColorByPackage,
+  getDate,
+  getPatientName,
+} from "./helpers";
 
 export default function UpcomingAppointments() {
   const currentUser = useContext(AuthContext);
+  const { date } = useContext(AppointmentCalendarContext);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
   const [updating, setUpdating] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  const getPatientName = (patient: Patient) =>
-    patient.full_name + " " + patient.nickname;
-
-  const getAppointmentTime = (time: string) => {
-    const [hours, minutes] = time.split(":");
-    return `${hours}:${minutes} ${parseInt(hours) >= 12 ? "PM" : "AM"}`;
-  };
 
   useEffect(() => {
     if (!currentUser) return;
@@ -79,7 +32,7 @@ export default function UpcomingAppointments() {
         )
         .eq("doctor_id", currentUser.id)
         .eq("status", "Approved")
-        .gt("appointment_date", new Date().toISOString())
+        .gt("appointment_date", getDate(date).toISOString())
         .order("appointment_date", { ascending: true })
         .limit(5);
 
@@ -94,7 +47,7 @@ export default function UpcomingAppointments() {
       }
     };
     fetchAppointments();
-  }, [currentUser]);
+  }, [currentUser, date]);
 
   const cancelAppointment = async (appointment: Appointment) => {
     const supabase = createClient();
@@ -179,14 +132,6 @@ export default function UpcomingAppointments() {
           <h4 className="text-lg font-semibold flex-1">
             Upcoming appointments
           </h4>
-          <div className="w-32">
-            <select className="bg-transparent focus:outline-none w-full">
-              <option>Today</option>
-              <option>Tomorrow</option>
-              <option>This week</option>
-              <option>This month</option>
-            </select>
-          </div>
         </div>
         <div className={"overflow-auto" + (loading ? " my-24" : " my-8")}>
           {loading && appointments.length == 0 && (

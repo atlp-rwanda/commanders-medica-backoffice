@@ -4,12 +4,15 @@ import { createClient } from "@/utils/supabase/client";
 import { useContext, useEffect, useState } from "react";
 import {
   Appointment,
+  AppointmentCalendarContext,
   getColorByPackage,
+  getDate,
   Patient,
-} from "./upcomingAppointments";
+} from "./helpers";
 
 export default function CancelledAppointments() {
   const currentUser = useContext(AuthContext);
+  const { date } = useContext(AppointmentCalendarContext);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -33,6 +36,7 @@ export default function CancelledAppointments() {
         )
         .eq("doctor_id", currentUser.id)
         .eq("status", "Cancelled")
+        .gt("appointment_date", getDate(date).toISOString())
         .order("appointment_date", { ascending: true })
         .limit(5);
 
@@ -47,20 +51,12 @@ export default function CancelledAppointments() {
       }
     };
     fetchAppointments();
-  }, [currentUser]);
+  }, [currentUser, date]);
 
   return (
     <section className="p-6 bg-white rounded-2xl shadow-md mb-3">
       <div className="flex flex-row">
         <h4 className="text-lg font-semibold flex-1">Cancelled Appointments</h4>
-        <div className="w-32">
-          <select className="bg-transparent focus:outline-none w-full">
-            <option>Today</option>
-            <option>Tomorrow</option>
-            <option>This week</option>
-            <option>This month</option>
-          </select>
-        </div>
       </div>
       <div className={"overflow-auto" + (loading ? " my-24" : " my-8")}>
         {loading && appointments.length == 0 && (
@@ -71,7 +67,8 @@ export default function CancelledAppointments() {
             No appointments found
           </p>
         )}
-        {!loading && appointments.length > 0 &&
+        {!loading &&
+          appointments.length > 0 &&
           appointments.map((appointment) => {
             const color = getColorByPackage(appointment.package);
             return (
