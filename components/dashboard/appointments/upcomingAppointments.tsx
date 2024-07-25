@@ -1,7 +1,10 @@
 import { AuthContext } from "@/app/dashboard/layout";
 import Loading from "@/components/Loading";
 import { createClient } from "@/utils/supabase/client";
+import { UUID } from "crypto";
+
 import { useContext, useEffect, useState } from "react";
+import { redirectTo } from "@/utils/supabase/getUser";
 import {
   Appointment,
   AppointmentCalendarContext,
@@ -9,6 +12,7 @@ import {
   getColorByPackage,
   getDate,
   getPatientName,
+  Patient,
 } from "./helpers";
 
 export default function UpcomingAppointments() {
@@ -19,7 +23,12 @@ export default function UpcomingAppointments() {
     useState<Appointment | null>(null);
   const [updating, setUpdating] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const getPatientName = (patient: Patient) =>
+    patient.full_name + " " + patient.nickname;
+  const getAppointmentTime = (time: string) => {
+    const [hours, minutes] = time.split(":");
+    return `${hours}:${minutes} ${parseInt(hours) >= 12 ? "PM" : "AM"}`;
+  };
   useEffect(() => {
     if (!currentUser) return;
     const supabase = createClient();
@@ -195,7 +204,7 @@ export default function UpcomingAppointments() {
                     <button className="bg-primary-500 border border-primary-500 text-white px-4 py-0.5 rounded-full hover:bg-primary-700 transition-colors">
                       Reschedule
                     </button>
-                    <button className="bg-primary-500 border border-primary-500 text-white px-4 py-0.5 rounded-full hover:bg-primary-700 transition-colors">
+                    <button onClick={()=>redirectTo(appointment.id)}className="bg-primary-500 border border-primary-500 text-white px-4 py-0.5 rounded-full hover:bg-primary-700 transition-colors">
                       Join
                     </button>
                   </div>

@@ -3,9 +3,9 @@ import MessagesMain from "@/components/messages/messagesSection";
 import Navbar from "@/components/navbar";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import { Suspense, useContext, useEffect, useState } from "react";
 import { AuthContext } from "../layout";
-
+import { useSearchParams } from "next/navigation";
 export interface AppointmentType {
   id: string;
   patient_id: string;
@@ -34,12 +34,13 @@ export interface MessageType {
   };
 }
 
-export default function Messages() {
+function Messages() {
   const router = useRouter();
   const currentUser = useContext(AuthContext);
   const [willRefresh, setwillRefresh] = useState<number>(0);
   const [messages, setMessages] = useState<MessageType[]>([]);
-
+  const searchParams = useSearchParams();
+  const appointmentId = searchParams.get('id');
   const fetchAppointments = async (
     userId: string
   ): Promise<AppointmentType[]> => {
@@ -52,7 +53,19 @@ export default function Messages() {
     if (error) throw error;
     return data;
   };
+  const sendInitialMessage = async (appointmentId: string, doctorId: string) => {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("messages")
+      .insert({
+        message: "Hello?",
+        type: "message",
+        sender_id: doctorId,
+        appointment_id: appointmentId
+      });
 
+    if (error) throw error;
+  };
   const fetchMessages = async (
     appointmentId: string
   ): Promise<MessageType[]> => {
@@ -66,7 +79,7 @@ export default function Messages() {
       .order("created_at", { ascending: true });
 
     if (error) throw error;
-    console.log(data);
+    // console.log(data);
     return data;
   };
 
@@ -87,7 +100,19 @@ export default function Messages() {
     };
     fetchAllData();
   }, [willRefresh, currentUser]);
-
+useEffect(() => {
+  const writeInitial=async()=>{
+  if (appointmentId) {
+    const currentMessages = await fetchMessages(appointmentId);
+    if (currentMessages.length === 0) {
+      await sendInitialMessage(appointmentId, currentUser?.id!);
+      return;
+      // setMessages(await fetchMessages(appointmentId));
+    }
+  }
+  }
+  writeInitial();
+}, [])
   useEffect(() => {
     const supabase = createClient();
     const createChannel = supabase
@@ -106,16 +131,24 @@ export default function Messages() {
     return () => {
       supabase.removeChannel(createChannel);
     };
-  }, []);
+  }, [router]);
 
   return (
-    <main className="bg-[#246BFD] flex">
-      <div className="my-[30px] w-fit">
-        <Navbar />
-      </div>
-      <div className="w-full h-[100vh]">
-        <MessagesMain messages={messages} />
-      </div>
-    </main>
+      <main className="bg-[#246BFD] flex">
+        <div className="my-[30px] w-fit">
+          <Navbar />
+        </div>
+        <div className="w-full h-[100vh]">
+          <MessagesMain messages={messages} />
+        </div>
+      </main>
+    
   );
+}
+export default function FixedMessages(){
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <Messages />
+    </Suspense>
+  )
 }
